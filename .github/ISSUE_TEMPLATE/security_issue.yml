@@ -1,0 +1,68 @@
+name: Security Issue Report
+description: Report a security concern or potential vulnerability in this repository.
+title: "[SECURITY] "
+labels:
+  - security
+  - needs-triage
+assignees:
+  - bobsoapwins
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > ⚠️ **Do not include actual secrets, credentials, or exploit code in this form.**
+        > If you need to share sensitive details, email the repository owner directly.
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe do you consider this issue?
+      options:
+        - Critical — immediate risk of data exposure or system compromise
+        - High — significant risk requiring urgent attention
+        - Medium — moderate risk that should be addressed soon
+        - Low — minor risk or informational finding
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide a clear and concise description of the security concern.
+      placeholder: Describe the issue without including sensitive data.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce (if applicable)
+      description: List the steps that demonstrate the issue.
+      placeholder: |
+        1. Go to '...'
+        2. Perform '...'
+        3. Observe '...'
+    validations:
+      required: false
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Potential Impact
+      description: Describe the potential impact if this issue is exploited or left unaddressed.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Submission Checklist
+      options:
+        - label: I have NOT included any secrets, credentials, or working exploit code in this report.
+          required: true
+        - label: I have checked existing issues to confirm this has not already been reported.
+          required: true
+        - label: I understand that this repository contains confidential information and I will keep the details of this report confidential.
+          required: true

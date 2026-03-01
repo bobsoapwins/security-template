@@ -1,0 +1,17 @@
+# CODEOWNERS — every file in every directory requires review from a repository owner.
+# All pull requests must be approved by at least one CODEOWNER before merging.
+#
+# Format: <pattern>  <owner1> <owner2> ...
+# The last matching pattern takes precedence.
+
+# Global: every file requires owner approval
+*                   @bobsoapwins
+
+# Workflows must be reviewed by an owner
+.github/workflows/* @bobsoapwins
+
+# Security policy must be reviewed by an owner
+SECURITY.md         @bobsoapwins
+
+# Sensitive documentation requires owner review
+docs/*              @bobsoapwins
