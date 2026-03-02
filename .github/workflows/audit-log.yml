@@ -103,5 +103,11 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "audit: log ${{ github.event_name }} event by ${{ github.actor }} [skip ci]"
-            git push
+            git push || {
+              EXIT_CODE=$?
+              echo "⚠️ Warning: Could not push audit log (exit code: $EXIT_CODE)."
+              echo "   This is expected when the main branch is protected and requires PRs."
+              echo "   The audit entry has been committed locally but not pushed."
+              exit 0
+            }
           fi

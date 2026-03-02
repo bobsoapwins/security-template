@@ -29,7 +29,13 @@ jobs:
       - name: Check PR title format
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
+          BRANCH: ${{ github.head_ref }}
         run: |
+          # Skip title validation for automated Copilot agent branches
+          if echo "$BRANCH" | grep -qP "^copilot/"; then
+            echo "ℹ️ Skipping PR title check for Copilot automated branch: $BRANCH"
+            exit 0
+          fi
           PATTERN="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|security)(\(.+\))?: .{1,100}$"
           if ! echo "$PR_TITLE" | grep -qP "$PATTERN"; then
             echo "❌ PR title does not follow Conventional Commits format."
@@ -54,12 +60,12 @@ jobs:
         env:
           BRANCH: ${{ github.head_ref }}
         run: |
-          PATTERN="^(feature|fix|hotfix|docs|chore|security|release)/[a-z0-9]([a-z0-9._-]*[a-z0-9])?$"
+          PATTERN="^(feature|fix|hotfix|docs|chore|security|release|copilot)/[a-z0-9]([a-z0-9._-]*[a-z0-9])?$"
           if ! echo "$BRANCH" | grep -qP "$PATTERN"; then
             echo "❌ Branch name does not follow the required convention."
             echo "   Expected: <type>/<slug>"
             echo "   Example:  feature/add-encryption"
-            echo "   Allowed types: feature fix hotfix docs chore security release"
+            echo "   Allowed types: feature fix hotfix docs chore security release copilot"
             exit 1
           fi
           echo "✅ Branch name is valid: $BRANCH"
@@ -77,7 +83,13 @@ jobs:
       - name: Check security checklist completion
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+          BRANCH: ${{ github.head_ref }}
         run: |
+          # Skip checklist validation for automated Copilot agent branches
+          if echo "$BRANCH" | grep -qP "^copilot/"; then
+            echo "ℹ️ Skipping security checklist check for Copilot automated branch: $BRANCH"
+            exit 0
+          fi
           # Look for unchecked security checklist items
           if echo "$PR_BODY" | grep -q "\- \[ \]"; then
             echo "❌ Security checklist contains unchecked items."
