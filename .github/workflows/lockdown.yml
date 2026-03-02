@@ -128,10 +128,14 @@ jobs:
           }
 
       - name: Send webhook notification
-        if: ${{ github.event.inputs.notify_webhook == 'true' && secrets.LOCKDOWN_WEBHOOK_URL != '' }}
+        if: github.event.inputs.notify_webhook == 'true'
         env:
           WEBHOOK_URL: ${{ secrets.LOCKDOWN_WEBHOOK_URL }}
         run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "No webhook URL configured (LOCKDOWN_WEBHOOK_URL secret is not set), skipping notification."
+            exit 0
+          fi
           PAYLOAD=$(jq -n \
             --arg text "*REPOSITORY LOCKDOWN* — \`${{ github.repository }}\`\nInitiated by *${{ github.actor }}* at ${{ steps.timestamp.outputs.ts }}\nReason: ${{ github.event.inputs.reason }}\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             '{text: $text}')
