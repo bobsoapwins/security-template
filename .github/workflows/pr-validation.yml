@@ -90,7 +90,7 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body }}
           BRANCH: ${{ github.head_ref }}
         run: |
-          # Skip checklist validation for automated Copilot agent branches
+          # Skip checklist validation for automated Copilot and Dependabot branches
           if echo "$BRANCH" | grep -qP "^(copilot|dependabot)/"; then
             echo "ℹ️ Skipping security checklist check for automated branch: $BRANCH"
             exit 0
