@@ -103,11 +103,17 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "audit: log ${{ github.event_name }} event by ${{ github.actor }} [skip ci]"
-            git push || {
-              EXIT_CODE=$?
-              echo "⚠️ Warning: Could not push audit log (exit code: $EXIT_CODE)."
-              echo "   This is expected when the main branch is protected and requires PRs."
+            CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+            if [ -z "$CURRENT_BRANCH" ]; then
+              echo "ℹ️ Skipping push: in detached HEAD state (e.g., pull_request event)."
               echo "   The audit entry has been committed locally but not pushed."
-              exit 0
-            }
+            else
+              git push origin "HEAD:$CURRENT_BRANCH" || {
+                EXIT_CODE=$?
+                echo "⚠️ Warning: Could not push audit log (exit code: $EXIT_CODE)."
+                echo "   This is expected when the main branch is protected and requires PRs."
+                echo "   The audit entry has been committed locally but not pushed."
+                exit 0
+              }
+            fi
           fi

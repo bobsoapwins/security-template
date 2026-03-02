@@ -60,6 +60,11 @@ jobs:
         env:
           BRANCH: ${{ github.head_ref }}
         run: |
+          # Skip validation for automated Dependabot branches
+          if echo "$BRANCH" | grep -qP "^dependabot/"; then
+            echo "ℹ️ Skipping branch name check for Dependabot branch: $BRANCH"
+            exit 0
+          fi
           PATTERN="^(feature|fix|hotfix|docs|chore|security|release|copilot)/[a-z0-9]([a-z0-9._-]*[a-z0-9])?$"
           if ! echo "$BRANCH" | grep -qP "$PATTERN"; then
             echo "❌ Branch name does not follow the required convention."
@@ -86,8 +91,8 @@ jobs:
           BRANCH: ${{ github.head_ref }}
         run: |
           # Skip checklist validation for automated Copilot agent branches
-          if echo "$BRANCH" | grep -qP "^copilot/"; then
-            echo "ℹ️ Skipping security checklist check for Copilot automated branch: $BRANCH"
+          if echo "$BRANCH" | grep -qP "^(copilot|dependabot)/"; then
+            echo "ℹ️ Skipping security checklist check for automated branch: $BRANCH"
             exit 0
           fi
           # Look for unchecked security checklist items
