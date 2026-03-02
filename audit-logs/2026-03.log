@@ -130,3 +130,14 @@
   "run_id": "22586071668",
   "run_url": "https://github.com/bobsoapwins/test-repository/actions/runs/22586071668"
 }
+{
+  "timestamp": "2026-03-02T17:02:20Z",
+  "event": "pull_request",
+  "action": "closed",
+  "actor": "bobsoapwins",
+  "ref": "refs/heads/main",
+  "sha": "5fe79eb80a3442b9d6961705155704815faa613f",
+  "repository": "bobsoapwins/test-repository",
+  "run_id": "22586658228",
+  "run_url": "https://github.com/bobsoapwins/test-repository/actions/runs/22586658228"
+}
