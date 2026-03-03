@@ -109,8 +109,10 @@ The following secrets must be configured in **Settings → Secrets and variables
 
 | Secret Name | Purpose | Required |
 |-------------|---------|----------|
-| `LOCKDOWN_WEBHOOK_URL` | Slack/Teams/custom webhook URL for lockdown alerts | Optional |
-| `ACCESS_ALERT_WEBHOOK_URL` | Webhook for collaborator/deploy-key change alerts | Optional |
+| `MAIL_SERVER` | SMTP server address for email notifications | Optional |
+| `MAIL_PORT` | SMTP server port for email notifications | Optional |
+| `MAIL_USERNAME` | SMTP username / sender email address | Optional |
+| `MAIL_PASSWORD` | SMTP password for sending alert emails | Optional |
 | `GITLEAKS_LICENSE` | Gitleaks Enterprise license key (for secret scanning) | Optional |
 
 ---

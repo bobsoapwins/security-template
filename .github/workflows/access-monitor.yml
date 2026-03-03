@@ -32,7 +32,7 @@ jobs:
       - name: Harden runner
         uses: step-security/harden-runner@v2
         with:
-          # Use 'audit' to allow egress to configured webhook URLs
+          # Use 'audit' to allow egress to configured email servers
           egress-policy: audit
 
       - name: Resolve event details
@@ -111,15 +111,22 @@ jobs:
 
             console.log(`Security alert issue created: ${issue.data.html_url}`);
 
-      - name: Send webhook notification
-        if: ${{ secrets.ACCESS_ALERT_WEBHOOK_URL != '' }}
-        env:
-          WEBHOOK_URL: ${{ secrets.ACCESS_ALERT_WEBHOOK_URL }}
-        run: |
-          PAYLOAD=$(jq -n \
-            --arg text "⚠️ *Access Change* in \`${{ github.repository }}\`\nEvent: \`${{ steps.details.outputs.event }}\` / \`${{ steps.details.outputs.action }}\`\nBy: *@${{ steps.details.outputs.actor }}*\nAt: ${{ steps.details.outputs.ts }}\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            '{text: $text}')
-          curl -s -X POST "$WEBHOOK_URL" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD"
-          echo "Access alert webhook sent."
+      - name: Send email notification
+        if: secrets.MAIL_SERVER != ''
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "⚠️ [ACCESS] ${{ steps.details.outputs.event }}/${{ steps.details.outputs.action }} in ${{ github.repository }}"
+          to: northdunne@gmail.com
+          from: ${{ secrets.MAIL_USERNAME }}
+          body: |
+            Access Change Detected in ${{ github.repository }}
+
+            Event  : ${{ steps.details.outputs.event }}
+            Action : ${{ steps.details.outputs.action }}
+            Actor  : @${{ steps.details.outputs.actor }}
+            Time   : ${{ steps.details.outputs.ts }}
+            Run    : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

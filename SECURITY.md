@@ -50,8 +50,8 @@ In the event of a suspected breach or unauthorized access:
 3. The workflow will immediately:
    - Create an incident report issue
    - Post an alert listing the triggering user and timestamp
-   - Optionally notify administrators via a webhook (configure `LOCKDOWN_WEBHOOK_URL`
-     in repository secrets)
+   - Optionally send an alert email to northdunne@gmail.com (configure `MAIL_SERVER`,
+     `MAIL_PORT`, `MAIL_USERNAME`, and `MAIL_PASSWORD` in repository secrets)
 
 ## Secret Handling
 
