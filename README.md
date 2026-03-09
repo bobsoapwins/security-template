@@ -6,18 +6,18 @@ Hello and welcome to my test repository! This is where I experiment with various
 
 ## Security Architecture
 
-| Layer | Control | Status |
-|-------|---------|--------|
-| **Branch Protection** | Rulesets enforce signed commits, required reviews, status checks | See `docs/RULESET_SETUP.md` |
-| **Code Ownership** | All files owned by `@bobsoapwins` via `CODEOWNERS` | ✅ Active |
-| **Static Analysis** | CodeQL scans every push & PR for vulnerabilities | ✅ Active |
-| **Secret Detection** | Gitleaks + TruffleHog scan every push & PR | ✅ Active |
-| **Dependency Review** | Every PR dependency change vetted against GitHub Advisory DB | ✅ Active |
-| **PR Validation** | Enforces Conventional Commits titles, branch naming, security checklist | ✅ Active |
-| **Audit Logging** | All repository events logged to `audit-logs/` | ✅ Active |
-| **Access Monitoring** | Collaborator/deploy-key changes trigger immediate security alerts | ✅ Active |
-| **Dependabot** | Weekly automated dependency update PRs | ✅ Active |
-| **Repository Lockdown** | Emergency manual workflow to freeze the repository | ✅ Active |
+| Layer | Control |
+|-------|---------|
+| **Branch Protection** | Rulesets enforce signed commits, required reviews, status checks (See `docs/RULESET_SETUP.md`)
+| **Code Ownership** | All files owned by `@bobsoapwins` via `CODEOWNERS`
+| **Static Analysis** | CodeQL scans every push & PR for vulnerabilities 
+| **Secret Detection** | Gitleaks + TruffleHog scan every push & PR 
+| **Dependency Review** | Every PR dependency change vetted against GitHub Advisory DB 
+| **PR Validation** | Enforces Conventional Commits titles, branch naming, security checklist 
+| **Audit Logging** | All repository events logged to `audit-logs/` 
+| **Access Monitoring** | Collaborator/deploy-key changes trigger immediate security alerts 
+| **Dependabot** | Weekly automated dependency update PRs 
+| **Repository Lockdown** | Emergency manual workflow to freeze the repository 
 
 ---
 
