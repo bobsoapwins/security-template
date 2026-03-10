@@ -56,8 +56,8 @@ jobs:
         with:
           sarif_file: semgrep.sarif
 
-      - name: Fail if high-severity findings were detected
+      - name: Fail if Semgrep findings were detected
         if: steps.semgrep.outcome == 'failure'
         run: |
-          echo "❌ Semgrep detected security issues. Review the Security tab for details."
+          echo "❌ Semgrep detected security issues (any severity). Review the Security tab for details."
           exit 1
