@@ -37,7 +37,7 @@ jobs:
           scan-ref: "."
           format: sarif
           output: trivy-results.sarif
-          # Fail on CRITICAL and HIGH vulnerabilities; report MEDIUM and LOW
+          # Fail on any finding at CRITICAL, HIGH, MEDIUM, or LOW severity
           severity: CRITICAL,HIGH,MEDIUM,LOW
           exit-code: "1"
           ignore-unfixed: true
