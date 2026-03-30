@@ -45,13 +45,7 @@ PR checklist (please complete before requesting review):
       minimum permissions required.
 - [ ] **No sensitive data in logs** — Added code does not log personally identifiable
       information (PII) or confidential data.
-- [ ] **CODEOWNERS consulted** — If this PR modifies files owned by specific teams,
-      those owners have been notified.
-- [ ] **Documentation updated** — Relevant documentation has been updated to reflect
-      these changes.
-- [ ] **Tests added/updated** — If applicable, tests have been added or updated to
-      cover the new behavior.
-
+      
 Reviewers will provide feedback and may ask for changes. Maintain open communication and address review comments promptly.
 
 ## Tests, CI and quality checks
