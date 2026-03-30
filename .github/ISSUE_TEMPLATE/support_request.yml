@@ -1,9 +1,9 @@
 ---
 name: "Support request"
-about: "Ask for help using the security-template, get troubleshooting guidance, or request non-security support."
+description: "Ask for help using the security-template, get troubleshooting guidance, or request non-security support."
 title: "[SUPPORT] "
 labels: ["support"]
-assignees: []
+assignees: [@bobsoapwins]
 ---
 
 <!--
