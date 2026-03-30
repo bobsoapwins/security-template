@@ -64,6 +64,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
+          ref: ${{ github.sha }}
 
       - name: Write audit log entry
         env:
