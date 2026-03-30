@@ -1,0 +1,58 @@
+---
+name: "Support request"
+about: "Ask for help using the security-template, get troubleshooting guidance, or request non-security support."
+title: "[SUPPORT] "
+labels: ["support"]
+assignees: []
+---
+
+<!--
+Thank you for using this project — please fill out the sections below.
+Do NOT include secrets (API keys, passwords, private tokens) in your issue.
+If you believe you’ve found a security vulnerability, do NOT open a public issue. See the repository's SUPPORT.md or SECURITY.md for private reporting options.
+-->
+
+### Short summary
+A one-line summary of the problem or question.
+
+### What I was trying to do
+Describe the task you were attempting and why.
+
+### Steps to reproduce
+Please provide concise, ordered steps to reproduce the issue. Include commands, minimal sample code, or links to a reproduction repository/gist if possible.
+1. 
+2. 
+3. 
+
+### Expected behavior
+What did you expect to happen?
+
+### Actual behavior
+What happened instead? Include exact error messages, stack traces, or other output. Paste logs using code blocks.
+
+### Repository / commit / tag
+Which version of the template are you using? (e.g., repository tag, commit SHA, branch)
+
+### Environment
+Include relevant environment information, for example:
+- OS (e.g., macOS 12.3, Ubuntu 22.04)
+- Shell / terminal
+- Tooling & versions (Node, Python, Terraform, etc.)
+- Any other relevant environment/context
+
+### Configuration & relevant files
+Attach or paste the minimal configuration or file snippets necessary to reproduce. Use a gist or link if content is large.
+
+### What I’ve already tried
+List debugging steps you’ve attempted and their results.
+
+### Screenshots / recordings
+(Optional) Include screenshots or short recordings that help explain the issue.
+
+### Additional context
+Anything else that may help maintainers diagnose or reproduce the issue.
+
+---
+If your question is general usage or conceptual, consider opening a Discussion instead (if enabled) — maintainers may direct support questions there to keep issues focused on actionable problems.
+
+Thank you — a maintainer will review and respond as soon as they can.
