@@ -53,5 +53,3 @@ This Code of Conduct is adapted for the bobsoapwins/security-template project. C
 
 ## License
 This document is provided under the same terms as the repository. You may copy and adapt it for other projects; please keep attribution when feasible.
-
----
