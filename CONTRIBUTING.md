@@ -4,16 +4,6 @@ Thank you for your interest in contributing to bobsoapwins/security-template —
 
 - If you find a security vulnerability, follow the steps listed in [ADVISORIES.md](https://github.com/bobsoapwins/security-template/blob/main/docs/ADVISORIES.md)
 
-## Table of contents
-- Reporting issues (non-security)
-- Reporting security issues (private)
-- How to contribute code
-- Branches and commit messages
-- Pull request process & checklist
-- Tests, CI and quality checks
-- Coding style
-- Code of conduct & licensing
-- Contact & acknowledgements
 
 ## Feature requests
 
@@ -47,13 +37,20 @@ When opening a PR, include:
 - Screenshots or logs if relevant.
 
 PR checklist (please complete before requesting review):
-- [ ] I have read the CONTRIBUTING.md
-- [ ] I have added or updated tests where appropriate
-- [ ] I ran all tests locally and they pass
-- [ ] I updated documentation if necessary
-- [ ] My PR is limited to a single concern / logical change
-- [ ] No sensitive data is included in the PR (secrets, private keys, credentials)
-- [ ] I followed the repository’s coding style and lint rules
+- [ ] **No secrets committed** — I have verified this PR does not introduce any
+      credentials, API keys, tokens, or other sensitive values.
+- [ ] **Dependency changes reviewed** — If dependencies were added or updated, they
+      have been checked against the GitHub Advisory Database.
+- [ ] **Least-privilege principle followed** — New code/config requests only the
+      minimum permissions required.
+- [ ] **No sensitive data in logs** — Added code does not log personally identifiable
+      information (PII) or confidential data.
+- [ ] **CODEOWNERS consulted** — If this PR modifies files owned by specific teams,
+      those owners have been notified.
+- [ ] **Documentation updated** — Relevant documentation has been updated to reflect
+      these changes.
+- [ ] **Tests added/updated** — If applicable, tests have been added or updated to
+      cover the new behavior.
 
 Reviewers will provide feedback and may ask for changes. Maintain open communication and address review comments promptly.
 
@@ -74,13 +71,13 @@ Reviewers will provide feedback and may ask for changes. Maintain open communica
 - Use environment variables and secrets management for CI.
 
 ## Code of conduct
-By contributing you agree to follow the project's Code of Conduct. If a CODE_OF_CONDUCT.md exists, follow that. If not, maintain respectful, inclusive, and constructive communication in issues and PRs.
+By contributing you agree to follow the project's Code of Conduct. Follow the procedures in [CODE_OF_CONDUCT.md](https://github.com/bobsoapwins/security-template/blob/main/CODE_OF_CONDUCT.md)
 
 ## License & contribution licensing
-By submitting a pull request you agree that your contributions will be licensed under the project's license. Confirm the repository license in LICENSE or ask maintainers if unclear.
+By submitting a pull request you agree that your contributions will be licensed under the project's license. Confirm the repository license in [LICENSE.md](https://github.com/bobsoapwins/security-template/blob/main/LICENSE.md) or ask maintainers if unclear.
 
 ## Attribution & thanks
-We appreciate all contributions both big and small. You will be listed under the "New Contributers" section of the changelog.
+We appreciate all contributions both big and small. You will be listed under the "New Contributers" section of the changelog. Changelogs can be found under the "Releases" tab of the homepage.
 
 ## Getting help
 If you need help or have questions about contributing, open an issue (non-security) or contact a maintainer.
