@@ -80,7 +80,7 @@ By contributing you agree to follow the project's Code of Conduct. If a CODE_OF_
 By submitting a pull request you agree that your contributions will be licensed under the project's license. Confirm the repository license in LICENSE or ask maintainers if unclear.
 
 ## Attribution & thanks
-We appreciate all contributions—big and small. If you want to be acknowledged, indicate that in your PR and we will credit you in the changelog or contributors list.
+We appreciate all contributions both big and small. You will be listed under the "New Contributers" section of the changelog.
 
 ## Getting help
 If you need help or have questions about contributing, open an issue (non-security) or contact a maintainer.
