@@ -7,7 +7,7 @@ Thank you for your interest in contributing to bobsoapwins/security-template. Yo
 
 ## Feature requests
 
-Open an issue and select the "Feature Request"
+Open an issue and select the "Feature Request" template, then follow the prompts.
 
 ## How to contribute code
 1. Fork the repository.
