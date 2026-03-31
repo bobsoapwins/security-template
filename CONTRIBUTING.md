@@ -1,6 +1,6 @@
 # Contributing to security-template
 
-Thank you for your interest in contributing to bobsoapwins/security-template — a repository created to test GitHub security measures. Your contributions help make this repo useful, safe, and maintainable. This document explains how to report problems, propose changes, and the expectations for contributions.
+Thank you for your interest in contributing to bobsoapwins/security-template. Your contributions help make this repo useful, safe, and maintainable. This document explains how to report problems, propose changes, and the expectations for contributions.
 
 - If you find a security vulnerability, follow the steps listed in [ADVISORIES.md](https://github.com/bobsoapwins/security-template/blob/main/docs/ADVISORIES.md)
 
