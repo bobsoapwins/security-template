@@ -36,7 +36,7 @@ When opening a PR, include:
 - Notes about migrations, breaking changes, or backward compatibility.
 - Screenshots or logs if relevant.
 
-PR checklist (please complete before requesting review):
+PR checklist (please complete before requesting review, included in new PRs):
 - [ ] **No secrets committed** — I have verified this PR does not introduce any
       credentials, API keys, tokens, or other sensitive values.
 - [ ] **Dependency changes reviewed** — If dependencies were added or updated, they
@@ -49,7 +49,7 @@ PR checklist (please complete before requesting review):
 Reviewers will provide feedback and may ask for changes. Maintain open communication and address review comments promptly.
 
 ## Tests, CI and quality checks
-- This repository uses automated CI checks (configure as appropriate).
+- This repository uses automated CI checks.
 - Ensure your changes pass CI before requesting a merge.
 - Add unit and integration tests for bug fixes or new features as appropriate.
 
@@ -71,7 +71,7 @@ By contributing you agree to follow the project's Code of Conduct. Follow the pr
 By submitting a pull request you agree that your contributions will be licensed under the project's license. Confirm the repository license in [LICENSE.md](https://github.com/bobsoapwins/security-template/blob/main/LICENSE.md) or ask maintainers if unclear.
 
 ## Attribution & thanks
-We appreciate all contributions both big and small. You will be listed under the "New Contributers" section of the changelog. Changelogs can be found under the "Releases" tab of the homepage.
+We appreciate all contributions both big and small. You will be listed under the "New Contributors" section of the changelog. Changelogs can be found under the "Releases" tab of the homepage.
 
 ## Getting help
-If you need help or have questions about contributing, open an issue (non-security) or contact a maintainer.
+If you need help or have questions about contributing, open a support request issue [here](https://github.com/bobsoapwins/security-template/issues/new?template=support_request.yml) or contact a maintainer.
