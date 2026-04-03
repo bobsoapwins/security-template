@@ -116,7 +116,11 @@ jobs:
                 fi
                 if [ "$attempt" -lt 3 ]; then
                   echo "Push attempt $attempt failed, rebasing onto latest remote and retrying..."
-                  git pull --rebase origin "$CURRENT_BRANCH"
+                  if ! git pull --rebase origin "$CURRENT_BRANCH"; then
+                    echo "⚠️ Warning: Could not rebase audit log changes onto origin/$CURRENT_BRANCH."
+                    echo "   The audit entry has been committed locally but not pushed."
+                    break
+                  fi
                 else
                   echo "⚠️ Warning: Could not push audit log after 3 attempts."
                   echo "   This is expected when the main branch is protected and requires PRs."
