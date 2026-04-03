@@ -78,8 +78,9 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           TIMESTAMP: ${{ github.event.head_commit.timestamp || github.event.pull_request.updated_at || github.event.issue.updated_at }}
         run: |
-          mkdir -p audit-logs
-          LOG_FILE="audit-logs/$(date -u +%Y-%m).log"
+          LOG_DIR="audit-logs/$(date -u +%Y-%m)"
+          mkdir -p "$LOG_DIR"
+          LOG_FILE="$LOG_DIR/$(date -u +%Y-%m-%dT%H-%M-%S)Z-${RUN_ID}.json"
           ENTRY=$(jq -n \
             --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --arg event "$EVENT_NAME" \
@@ -91,7 +92,7 @@ jobs:
             --arg run_id "$RUN_ID" \
             --arg run_url "$RUN_URL" \
             '{timestamp: $ts, event: $event, action: $action, actor: $actor, ref: $ref, sha: $sha, repository: $repo, run_id: $run_id, run_url: $run_url}')
-          echo "$ENTRY" >> "$LOG_FILE"
+          echo "$ENTRY" > "$LOG_FILE"
           echo "Audit entry written to $LOG_FILE:"
           echo "$ENTRY" | jq .
 
@@ -109,12 +110,18 @@ jobs:
               echo "ℹ️ Skipping push: in detached HEAD state (e.g., pull_request event)."
               echo "   The audit entry has been committed locally but not pushed."
             else
-              git push origin "HEAD:$CURRENT_BRANCH" || {
-                EXIT_CODE=$?
-                echo "⚠️ Warning: Could not push audit log (exit code: $EXIT_CODE)."
-                echo "   This is expected when the main branch is protected and requires PRs."
-                echo "   The audit entry has been committed locally but not pushed."
-                exit 0
-              }
+              for attempt in 1 2 3; do
+                if git push origin "HEAD:$CURRENT_BRANCH"; then
+                  break
+                fi
+                if [ "$attempt" -lt 3 ]; then
+                  echo "Push attempt $attempt failed, rebasing onto latest remote and retrying..."
+                  git pull --rebase origin "$CURRENT_BRANCH"
+                else
+                  echo "⚠️ Warning: Could not push audit log after 3 attempts."
+                  echo "   This is expected when the main branch is protected and requires PRs."
+                  echo "   The audit entry has been committed locally but not pushed."
+                fi
+              done
             fi
           fi
