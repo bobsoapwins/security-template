@@ -63,8 +63,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          fetch-depth: 1
-          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Prepare audit-logs branch
+        run: |
+          if git ls-remote --exit-code --heads origin audit-logs > /dev/null 2>&1; then
+            git fetch origin audit-logs:refs/heads/audit-logs
+            git checkout audit-logs
+          else
+            git checkout --orphan audit-logs
+            git rm -rf . 2>/dev/null || true
+          fi
 
       - name: Write audit log entry
         env:
@@ -105,35 +114,15 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "audit: log ${{ github.event_name }} event by ${{ github.actor }} [skip ci]"
-            CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
-            if [ -z "$CURRENT_BRANCH" ]; then
-              # Derive branch from GITHUB_REF_NAME as a fallback for events that
-              # remain in detached HEAD state after checkout. Skip push for PR
-              # merge refs (e.g. "18/merge") and non-branch refs (tags).
-              if [[ "${GITHUB_REF_TYPE:-}" = "branch" && "${GITHUB_REF_NAME:-}" != *"/merge" ]]; then
-                CURRENT_BRANCH="${GITHUB_REF_NAME:-}"
+            for attempt in 1 2 3; do
+              if git push origin audit-logs; then
+                break
               fi
-            fi
-            if [ -z "$CURRENT_BRANCH" ]; then
-              echo "ℹ️ Skipping push: in detached HEAD state (e.g., pull_request or tag event)."
-              echo "   The audit entry has been committed locally but not pushed."
-            else
-              for attempt in 1 2 3; do
-                if git push origin "HEAD:$CURRENT_BRANCH"; then
-                  break
-                fi
-                if [ "$attempt" -lt 3 ]; then
-                  echo "Push attempt $attempt failed, rebasing onto latest remote and retrying..."
-                  if ! git pull --rebase origin "$CURRENT_BRANCH"; then
-                    echo "⚠️ Warning: Could not rebase audit log changes onto origin/$CURRENT_BRANCH."
-                    echo "   The audit entry has been committed locally but not pushed."
-                    break
-                  fi
-                else
-                  echo "⚠️ Warning: Could not push audit log after 3 attempts."
-                  echo "   This is expected when the main branch is protected and requires PRs."
-                  echo "   The audit entry has been committed locally but not pushed."
-                fi
-              done
-            fi
+              if [ "$attempt" -lt 3 ]; then
+                echo "Push attempt $attempt failed, rebasing onto latest remote and retrying..."
+                git pull --rebase origin audit-logs || { echo "⚠️ Rebase failed; audit entry committed locally but not pushed."; break; }
+              else
+                echo "⚠️ Warning: Could not push audit log after 3 attempts."
+              fi
+            done
           fi

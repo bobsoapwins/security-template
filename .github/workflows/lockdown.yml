@@ -45,6 +45,18 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Prepare audit-logs branch
+        run: |
+          if git ls-remote --exit-code --heads origin audit-logs > /dev/null 2>&1; then
+            git fetch origin audit-logs:refs/heads/audit-logs
+            git checkout audit-logs
+          else
+            git checkout --orphan audit-logs
+            git rm -rf . 2>/dev/null || true
+          fi
 
       - name: Record lockdown timestamp
         id: timestamp
@@ -119,13 +131,14 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add audit-logs/
           git diff --cached --quiet || git commit -m "audit: LOCKDOWN initiated by ${{ github.actor }} [skip ci]"
-          git push || {
-            EXIT_CODE=$?
-            echo "LogWarning: Could not push lockdown audit record (exit code: $EXIT_CODE)."
-            echo "   This is expected when the main branch is protected and requires PRs."
-            echo "   The audit entry has been committed locally but not pushed."
-            exit 0
-          }
+          for attempt in 1 2 3; do
+            if git push origin audit-logs; then break; fi
+            if [ "$attempt" -lt 3 ]; then
+              git pull --rebase origin audit-logs || { echo "⚠️ Rebase failed; audit entry committed locally but not pushed."; break; }
+            else
+              echo "⚠️ Warning: Could not push lockdown audit record after 3 attempts."
+            fi
+          done
 
       - name: Send webhook notification
         if: github.event.inputs.notify_webhook == 'true'
