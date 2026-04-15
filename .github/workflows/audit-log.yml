@@ -157,17 +157,20 @@ jobs:
 
           git commit -m "audit: log ${{ github.event_name }} event by ${{ github.actor }} [skip ci]"
 
+          PUSH_LOG="/tmp/push-output-${{ github.run_id }}.txt"
+          PAT_PUSH_LOG="/tmp/push-pat-output-${{ github.run_id }}.txt"
+
           # --- Attempt 1-3: push with the default GITHUB_TOKEN ---
           for attempt in 1 2 3; do
             echo "::group::Push attempt $attempt (GITHUB_TOKEN)"
-            if git push origin audit-logs 2>&1 | tee /tmp/push-output.txt; then
+            if git push origin audit-logs 2>&1 | tee "$PUSH_LOG"; then
               echo "✅ Push succeeded on attempt $attempt."
               PUSH_SUCCEEDED=true
               echo "::endgroup::"
               break
             fi
             echo "::endgroup::"
-            cat /tmp/push-output.txt
+            cat "$PUSH_LOG"
 
             if [ "$attempt" -lt 3 ]; then
               echo "Push attempt $attempt failed, rebasing onto latest remote and retrying..."
@@ -183,14 +186,16 @@ jobs:
           # --- Fallback: push with AUDIT_PUSH_PAT if available ---
           if [ "$PUSH_SUCCEEDED" = "false" ] && [ -n "$AUDIT_PUSH_PAT" ]; then
             echo "::group::Fallback push with AUDIT_PUSH_PAT"
-            REPO_URL="https://x-access-token:${AUDIT_PUSH_PAT}@github.com/${{ github.repository }}.git"
-            if git push "$REPO_URL" audit-logs 2>&1 | tee /tmp/push-pat-output.txt; then
+            # Configure the PAT via a credential helper to avoid exposing it
+            # in the process argument list.
+            git -c "http.https://github.com/.extraheader=Authorization: basic $(echo -n "x-access-token:${AUDIT_PUSH_PAT}" | base64)" \
+              push origin audit-logs 2>&1 | tee "$PAT_PUSH_LOG" && {
               echo "✅ Fallback push with AUDIT_PUSH_PAT succeeded."
               PUSH_SUCCEEDED=true
-            else
+            } || {
               echo "❌ Fallback push with AUDIT_PUSH_PAT also failed:"
-              cat /tmp/push-pat-output.txt
-            fi
+              cat "$PAT_PUSH_LOG"
+            }
             echo "::endgroup::"
           fi
 
@@ -249,8 +254,8 @@ jobs:
           echo "::endgroup::"
           echo ""
           echo "::group::Last push output"
-          cat /tmp/push-output.txt 2>/dev/null || echo "(no push output captured)"
-          cat /tmp/push-pat-output.txt 2>/dev/null || echo "(no PAT push output captured)"
+          cat "/tmp/push-output-${{ github.run_id }}.txt" 2>/dev/null || echo "(no push output captured)"
+          cat "/tmp/push-pat-output-${{ github.run_id }}.txt" 2>/dev/null || echo "(no PAT push output captured)"
           echo "::endgroup::"
 
       # Always upload the audit JSON as an artifact so entries are preserved
