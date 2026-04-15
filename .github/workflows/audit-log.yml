@@ -1,6 +1,22 @@
 name: Audit Log
 
 # Capture every meaningful repository event and record it in a structured log.
+# Audit entries are pushed to the orphan "audit-logs" branch.
+# If the push fails (e.g. due to branch-protection rules or token permissions),
+# the workflow uploads the JSON entry as a build artifact so no data is lost,
+# and attempts a fallback push using the AUDIT_PUSH_PAT secret when available.
+#
+# Required manual setup when push fails:
+#   Option A – Add a PAT secret:
+#     1. Create a fine-grained Personal Access Token with "Contents: Read & Write"
+#        scope for this repository (or a classic token with "repo" scope).
+#     2. Add it as a repository secret named AUDIT_PUSH_PAT.
+#   Option B – Adjust repository rules:
+#     1. Go to Settings → Rules → Rulesets and either exempt "github-actions[bot]"
+#        from the ruleset that covers the "audit-logs" branch, or add a bypass
+#        entry for the GitHub Actions app.
+#     2. Ensure the "audit-logs" branch is not subject to "Restrict creations"
+#        or required status checks that would block automated pushes.
 on:
   push:
     branches:
@@ -65,12 +81,26 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Print the permissions scope visible to the runner for debugging.
+      # This does NOT print any secrets or tokens.
+      - name: Debug permissions scope
+        run: |
+          echo "::group::Effective workflow permissions"
+          echo "permissions.contents: write (declared in workflow YAML)"
+          echo "permissions.issues:   write (declared in workflow YAML)"
+          echo "GITHUB_TOKEN scopes are not directly queryable, but the"
+          echo "declared permissions above control what the token can do."
+          echo "If the repository default is read-only, these explicit"
+          echo "declarations override it for this workflow."
+          echo "::endgroup::"
+
       - name: Prepare audit-logs branch
         run: |
           if git ls-remote --exit-code --heads origin audit-logs > /dev/null 2>&1; then
             git fetch origin audit-logs:refs/heads/audit-logs
             git checkout audit-logs
           else
+            echo "ℹ️ Branch 'audit-logs' does not exist on remote; creating orphan branch."
             git checkout --orphan audit-logs
             git rm -rf . 2>/dev/null || true
           fi
@@ -104,25 +134,131 @@ jobs:
           echo "$ENTRY" > "$LOG_FILE"
           echo "Audit entry written to $LOG_FILE:"
           echo "$ENTRY" | jq .
+          # Save the file path for the artifact upload step
+          echo "AUDIT_LOG_FILE=$LOG_FILE" >> "$GITHUB_ENV"
 
       - name: Commit audit log
+        id: commit_and_push
+        env:
+          # Optional: a PAT with write access to push past branch-protection rules.
+          # If the secret is not set, this variable will be empty.
+          AUDIT_PUSH_PAT: ${{ secrets.AUDIT_PUSH_PAT }}
         run: |
+          PUSH_SUCCEEDED=false
+
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add audit-logs/
           if git diff --cached --quiet; then
             echo "No changes to commit."
-          else
-            git commit -m "audit: log ${{ github.event_name }} event by ${{ github.actor }} [skip ci]"
-            for attempt in 1 2 3; do
-              if git push origin audit-logs; then
-                break
-              fi
-              if [ "$attempt" -lt 3 ]; then
-                echo "Push attempt $attempt failed, rebasing onto latest remote and retrying..."
-                git pull --rebase origin audit-logs || { echo "⚠️ Rebase failed; audit entry committed locally but not pushed."; break; }
-              else
-                echo "⚠️ Warning: Could not push audit log after 3 attempts."
-              fi
-            done
+            echo "push_failed=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+
+          git commit -m "audit: log ${{ github.event_name }} event by ${{ github.actor }} [skip ci]"
+
+          # --- Attempt 1-3: push with the default GITHUB_TOKEN ---
+          for attempt in 1 2 3; do
+            echo "::group::Push attempt $attempt (GITHUB_TOKEN)"
+            if git push origin audit-logs 2>&1 | tee /tmp/push-output.txt; then
+              echo "✅ Push succeeded on attempt $attempt."
+              PUSH_SUCCEEDED=true
+              echo "::endgroup::"
+              break
+            fi
+            echo "::endgroup::"
+            cat /tmp/push-output.txt
+
+            if [ "$attempt" -lt 3 ]; then
+              echo "Push attempt $attempt failed, rebasing onto latest remote and retrying..."
+              git pull --rebase origin audit-logs 2>&1 || {
+                echo "⚠️ Rebase failed; audit entry committed locally but not pushed."
+                break
+              }
+            else
+              echo "⚠️ Push failed after 3 attempts with GITHUB_TOKEN."
+            fi
+          done
+
+          # --- Fallback: push with AUDIT_PUSH_PAT if available ---
+          if [ "$PUSH_SUCCEEDED" = "false" ] && [ -n "$AUDIT_PUSH_PAT" ]; then
+            echo "::group::Fallback push with AUDIT_PUSH_PAT"
+            REPO_URL="https://x-access-token:${AUDIT_PUSH_PAT}@github.com/${{ github.repository }}.git"
+            if git push "$REPO_URL" audit-logs 2>&1 | tee /tmp/push-pat-output.txt; then
+              echo "✅ Fallback push with AUDIT_PUSH_PAT succeeded."
+              PUSH_SUCCEEDED=true
+            else
+              echo "❌ Fallback push with AUDIT_PUSH_PAT also failed:"
+              cat /tmp/push-pat-output.txt
+            fi
+            echo "::endgroup::"
+          fi
+
+          if [ "$PUSH_SUCCEEDED" = "false" ]; then
+            if [ -z "$AUDIT_PUSH_PAT" ]; then
+              echo ""
+              echo "============================================================"
+              echo "❌ AUDIT LOG PUSH FAILED"
+              echo "============================================================"
+              echo "The push to the 'audit-logs' branch was rejected."
+              echo "This is likely caused by repository rulesets or branch"
+              echo "protection that blocks GITHUB_TOKEN from pushing."
+              echo ""
+              echo "To fix this, choose one of:"
+              echo ""
+              echo "  Option A: Add an AUDIT_PUSH_PAT secret"
+              echo "    1. Create a fine-grained PAT with 'Contents: Read & Write'"
+              echo "       scope for this repository."
+              echo "    2. Go to Settings → Secrets and variables → Actions"
+              echo "    3. Add a new repository secret named AUDIT_PUSH_PAT"
+              echo ""
+              echo "  Option B: Adjust repository rulesets"
+              echo "    1. Go to Settings → Rules → Rulesets"
+              echo "    2. Either exclude the 'audit-logs' branch from the"
+              echo "       ruleset, or add 'github-actions[bot]' as a bypass actor."
+              echo "============================================================"
+            fi
+            echo "push_failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "push_failed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # When push fails, capture diagnostic info for maintainers to triage
+      # branch-protection vs token-permission issues.
+      - name: Push failure diagnostics
+        if: steps.commit_and_push.outputs.push_failed == 'true'
+        run: |
+          echo "============================================================"
+          echo "AUDIT LOG PUSH DIAGNOSTICS"
+          echo "============================================================"
+          echo ""
+          echo "::group::git remote -v"
+          git remote -v
+          echo "::endgroup::"
+          echo ""
+          echo "::group::git show-ref"
+          git show-ref || echo "(no refs found)"
+          echo "::endgroup::"
+          echo ""
+          echo "::group::git status --porcelain"
+          git status --porcelain
+          echo "::endgroup::"
+          echo ""
+          echo "::group::git branch -av"
+          git branch -av
+          echo "::endgroup::"
+          echo ""
+          echo "::group::Last push output"
+          cat /tmp/push-output.txt 2>/dev/null || echo "(no push output captured)"
+          cat /tmp/push-pat-output.txt 2>/dev/null || echo "(no PAT push output captured)"
+          echo "::endgroup::"
+
+      # Always upload the audit JSON as an artifact so entries are preserved
+      # even when the push to the audit-logs branch fails.
+      - name: Upload audit log artifact
+        if: always() && env.AUDIT_LOG_FILE != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-log-entry-${{ github.run_id }}
+          path: ${{ env.AUDIT_LOG_FILE }}
+          retention-days: 90
