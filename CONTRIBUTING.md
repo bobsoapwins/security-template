@@ -11,10 +11,7 @@ Open an issue and select the "Feature Request" template, then follow the prompts
 
 ## How to contribute code
 1. Fork the repository.
-2. Create a descriptive branch from main (or the repository's default branch) named like:
-   - feature/<short-description>
-   - fix/<short-description>
-   - chore/<short-description>
+2. Create a descriptive branch from main (or the repository's default branch) that summarizes all changes made in the pull request.
 3. Run tests and linters locally before committing.
 4. Write clear, atomic commits with descriptive messages.
 5. Open a Pull Request (PR) from your branch to the repository's default branch.
