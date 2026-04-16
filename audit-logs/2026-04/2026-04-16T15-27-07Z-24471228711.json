@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-04-16T15:27:07Z",
+  "event": "pull_request",
+  "action": "opened",
+  "actor": "Copilot",
+  "ref": "refs/pull/20/merge",
+  "sha": "5f59cecc1d1e04f2287d1b214afa7de2d034f9ef",
+  "repository": "bobsoapwins/security-template",
+  "run_id": "24471228711",
+  "run_url": "https://github.com/bobsoapwins/security-template/actions/runs/24471228711"
+}
