@@ -170,7 +170,6 @@ jobs:
               break
             fi
             echo "::endgroup::"
-            cat "$PUSH_LOG"
 
             if [ "$attempt" -lt 3 ]; then
               echo "Push attempt $attempt failed, rebasing onto latest remote and retrying..."
@@ -186,16 +185,26 @@ jobs:
           # --- Fallback: push with AUDIT_PUSH_PAT if available ---
           if [ "$PUSH_SUCCEEDED" = "false" ] && [ -n "$AUDIT_PUSH_PAT" ]; then
             echo "::group::Fallback push with AUDIT_PUSH_PAT"
-            # Configure the PAT via a credential helper to avoid exposing it
-            # in the process argument list.
-            git -c "http.https://github.com/.extraheader=Authorization: basic $(echo -n "x-access-token:${AUDIT_PUSH_PAT}" | base64)" \
-              push origin audit-logs 2>&1 | tee "$PAT_PUSH_LOG" && {
+            # Use GIT_ASKPASS so the PAT is not exposed in the git command line.
+            ASKPASS_SCRIPT="/tmp/git-askpass-${{ github.run_id }}.sh"
+            cat > "$ASKPASS_SCRIPT" <<'EOF'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' "x-access-token" ;;
+            *Password*) printf '%s\n' "$AUDIT_PUSH_PAT" ;;
+            *) printf '\n' ;;
+          esac
+          EOF
+            chmod 700 "$ASKPASS_SCRIPT"
+            GIT_ASKPASS="$ASKPASS_SCRIPT" GIT_TERMINAL_PROMPT=0 \
+              git push origin audit-logs 2>&1 | tee "$PAT_PUSH_LOG" && {
               echo "✅ Fallback push with AUDIT_PUSH_PAT succeeded."
               PUSH_SUCCEEDED=true
             } || {
               echo "❌ Fallback push with AUDIT_PUSH_PAT also failed:"
               cat "$PAT_PUSH_LOG"
             }
+            rm -f "$ASKPASS_SCRIPT"
             echo "::endgroup::"
           fi
 
