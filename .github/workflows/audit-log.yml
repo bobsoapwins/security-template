@@ -280,3 +280,14 @@ jobs:
           name: audit-log-entry-${{ github.run_id }}
           path: ${{ env.AUDIT_LOG_FILE }}
           retention-days: 90
+
+      # Fail the workflow when the push did not succeed so that "false success"
+      # runs are no longer green.  This runs after artifact upload to ensure
+      # the audit entry is preserved regardless.
+      - name: Fail workflow if push failed
+        if: steps.commit_and_push.outputs.push_failed == 'true'
+        run: |
+          echo "❌ Audit log entry was not pushed to the audit-logs branch."
+          echo "The entry has been preserved as a workflow artifact."
+          echo "See earlier steps for diagnostics and remediation instructions."
+          exit 1
