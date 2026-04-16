@@ -10,7 +10,9 @@ name: Audit Log
 #   Option A – Add a PAT secret:
 #     1. Create a fine-grained Personal Access Token with "Contents: Read & Write"
 #        scope for this repository (or a classic token with "repo" scope).
-#     2. Add it as a repository secret named AUDIT_PUSH_PAT.
+#     2. Ensure the token owner is a bypass actor for the repository ruleset
+#        that covers the audit-logs branch (a PAT alone does not bypass rulesets).
+#     3. Add it as a repository secret named AUDIT_PUSH_PAT.
 #   Option B – Adjust repository rules:
 #     1. Go to Settings → Rules → Rulesets and either exempt "github-actions[bot]"
 #        from the ruleset that covers the "audit-logs" branch, or add a bypass
@@ -223,8 +225,10 @@ jobs:
               echo "  Option A: Add an AUDIT_PUSH_PAT secret"
               echo "    1. Create a fine-grained PAT with 'Contents: Read & Write'"
               echo "       scope for this repository."
-              echo "    2. Go to Settings → Secrets and variables → Actions"
-              echo "    3. Add a new repository secret named AUDIT_PUSH_PAT"
+              echo "    2. Ensure the PAT owner is a bypass actor for the ruleset"
+              echo "       covering the audit-logs branch."
+              echo "    3. Go to Settings → Secrets and variables → Actions"
+              echo "    4. Add a new repository secret named AUDIT_PUSH_PAT"
               echo ""
               echo "  Option B: Adjust repository rulesets"
               echo "    1. Go to Settings → Rules → Rulesets"
