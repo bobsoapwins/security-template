@@ -20,7 +20,14 @@ Choose **one** of the remediation options below.
 
 ### Option A – Add an `AUDIT_PUSH_PAT` secret (recommended)
 
-A Personal Access Token (PAT) that bypasses rulesets for the `audit-logs` branch.
+A Personal Access Token (PAT) belonging to a user who is permitted to push to
+the `audit-logs` branch under the active repository ruleset (typically a repo
+admin or a user listed as a **bypass actor** in the ruleset).
+
+> **Important:** A PAT alone does not bypass rulesets. The token's owner must be
+> an allowed bypass actor for the ruleset that covers the `audit-logs` branch.
+> If no bypass actors are configured, you will also need to add the PAT owner
+> (or adjust the ruleset per Option B).
 
 1. Go to **GitHub → Settings → Developer settings → Personal access tokens →
    Fine-grained tokens**.
@@ -29,8 +36,11 @@ A Personal Access Token (PAT) that bypasses rulesets for the `audit-logs` branch
 4. Under **Permissions → Repository permissions**, grant **Contents: Read and
    write**. No other permissions are needed.
 5. Click **Generate token** and copy the value.
-6. In this repository go to **Settings → Secrets and variables → Actions**.
-7. Click **New repository secret**, name it **`AUDIT_PUSH_PAT`**, paste the
+6. Ensure the token owner is listed as a **bypass actor** in the repository
+   ruleset that covers the `audit-logs` branch (Settings → Rules → Rulesets →
+   select the ruleset → Bypass list).
+7. In this repository go to **Settings → Secrets and variables → Actions**.
+8. Click **New repository secret**, name it **`AUDIT_PUSH_PAT`**, paste the
    token, and save.
 
 The workflow will automatically use `AUDIT_PUSH_PAT` as a fallback whenever the
