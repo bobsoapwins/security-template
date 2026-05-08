@@ -237,23 +237,24 @@ jobs:
               .map((f) => `- \`${f.filename}\` (+${f.additions}/-${f.deletions})`)
               .join('\n') || '- None';
 
-            const body = `${marker}
-## 🔎 Merge Impact Assessment
-
-**Danger Level:** \`${riskLevel}\`  
-**Risk Score:** \`${riskScore}\`
-
-### Repository Effects
-${effects.map((e) => `- ${e}`).join('\n')}
-
-### Most Impacted Files
-${topChanged}
-
-### Reviewer Guidance
-- Verify the summary above against the intended PR scope.
-- For \`High\` or \`Critical\` danger, require extra reviewer scrutiny before merge.
-- Ensure required status checks and security controls remain intact after merge.
-`;
+            const body = [
+              marker,
+              '## 🔎 Merge Impact Assessment',
+              '',
+              `**Danger Level:** \`${riskLevel}\`  `,
+              `**Risk Score:** \`${riskScore}\``,
+              '',
+              '### Repository Effects',
+              ...effects.map((e) => `- ${e}`),
+              '',
+              '### Most Impacted Files',
+              topChanged,
+              '',
+              '### Reviewer Guidance',
+              '- Verify the summary above against the intended PR scope.',
+              '- For `High` or `Critical` danger, require extra reviewer scrutiny before merge.',
+              '- Ensure required status checks and security controls remain intact after merge.'
+            ].join('\n');
 
             const comments = await github.paginate(
               github.rest.issues.listComments,
