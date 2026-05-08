@@ -201,7 +201,7 @@ jobs:
               /(secret|token|credential|password|private[-_]?key|\.pem$|\.p12$|\.pfx$|\.key$)/i.test(p)
             );
             const docsOnly = changedPaths.length > 0 &&
-              changedPaths.every((p) => /^docs\/|\.md$/i.test(p));
+              changedPaths.every((p) => /^(docs\/|.*\.md$)/i.test(p));
 
             let riskScore = 0;
             if (totals.files > 100) riskScore += 3;
@@ -241,7 +241,7 @@ jobs:
               marker,
               '## 🔎 Merge Impact Assessment',
               '',
-              `**Danger Level:** \`${riskLevel}\`  `,
+              `**Danger Level:** \`${riskLevel}\``,
               `**Risk Score:** \`${riskScore}\``,
               '',
               '### Repository Effects',
