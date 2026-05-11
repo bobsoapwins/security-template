@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   # ── 1. Validate PR title follows Conventional Commits ──────────────────────
