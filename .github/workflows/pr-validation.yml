@@ -12,9 +12,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  issues: write
-  statuses: write
 
 jobs:
   # ── 1. Validate PR title follows Conventional Commits ──────────────────────
@@ -162,6 +159,9 @@ jobs:
   merge-impact:
     name: Merge Impact Assessment
     runs-on: ubuntu-latest
+    concurrency:
+      group: merge-impact-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     steps:
       - name: Harden runner
         uses: step-security/harden-runner@v2
@@ -259,7 +259,7 @@ jobs:
             );
 
             const existing = comments.find((c) =>
-              c.user?.type === 'Bot' && c.body?.includes(marker)
+              c.user?.login === 'github-actions[bot]' && c.body?.includes(marker)
             );
 
             if (existing) {
