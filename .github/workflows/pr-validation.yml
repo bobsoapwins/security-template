@@ -179,7 +179,13 @@ jobs:
             const pull_number = context.payload.pull_request.number;
             const headRepo = context.payload.pull_request?.head?.repo;
             const baseRepo = context.payload.pull_request?.base?.repo;
-            const isCrossRepositoryPr = !headRepo || !baseRepo || headRepo.id !== baseRepo.id;
+            const isCrossRepositoryPr = Boolean(
+              headRepo && baseRepo && (
+                (typeof headRepo.id === 'number' && typeof baseRepo.id === 'number')
+                  ? headRepo.id !== baseRepo.id
+                  : headRepo.full_name !== baseRepo.full_name
+              )
+            );
 
             if (isCrossRepositoryPr) {
               core.notice('Cross-repository pull request detected; skipping merge-impact comment upsert because write permissions are not available on pull_request events from forks.');
