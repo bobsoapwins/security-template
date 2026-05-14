@@ -2,17 +2,12 @@ name: PR Validation
 
 on:
   pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
   issues: write
+  pull-requests: write
 
 jobs:
   # ── 1. Validate PR title follows Conventional Commits ──────────────────────
