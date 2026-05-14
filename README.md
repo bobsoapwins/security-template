@@ -43,5 +43,4 @@ Hello and welcome to my test repository! This is where I experiment with various
 3. All status checks must pass before merging
 4. At least one CODEOWNER approval is required
 
-See [SECURITY.md](SECURITY.md) for the full security policy and vulnerability
-reporting process.
+See [SECURITY.md](https://github.com/bobsoapwins/security-template/blob/main/docs/SECURITY.md) for the full security policy and vulnerability reporting process.
