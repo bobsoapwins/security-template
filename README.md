@@ -14,9 +14,9 @@ Hello and welcome to my test repository! This is where I experiment with various
 | **Secret Detection** | Gitleaks + TruffleHog scan every push & PR 
 | **Dependency Review** | Every PR dependency change vetted against GitHub Advisory DB 
 | **PR Validation** | Enforces Conventional Commits titles, branch naming, security checklist 
-| **Audit Logging** | All repository events logged to `audit-logs/` (seperate branch, not listed in audit-logs folder)
+| **Audit Logging** | All repository events logged to `audit-logs` (seperate branch, not listed in audit-logs folder)
 | **Access Monitoring** | Collaborator/deploy-key changes trigger immediate security alerts 
-| **Dependabot** | Weekly automated dependency update PRs 
+| **Dependabot** | Weekly automated dependency update PRs if necessary
 | **Repository Lockdown** | Emergency manual workflow to freeze the repository 
 
 ---
